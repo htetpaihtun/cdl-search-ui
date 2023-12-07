@@ -86,6 +86,7 @@ const config = {
   facets: {
     "type.keyword" : { type: "value" },
     "person.gender": { type: "value", size: 3 } 
+    "person.nationality": { type: "value", size: 100 } 
   }
 };
 
