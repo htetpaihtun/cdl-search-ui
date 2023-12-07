@@ -81,13 +81,13 @@ const config = {
       adhoc : { raw: {} },
       dj : { raw: {} },
     },
+    facets: {
+      "type": { type: "value", size: 10 },
+      "person.citizenship": { type: "value", size: 10 },
+      "person.gender": { type: "value", size: 10 },
+    }
   },
-  // disjunctiveFacets: ["acres", "states", "date_established", "location"],
-  facets: {
-    "type.keyword" : { type: "value" },
-    "person.gender": { type: "value", size: 3 },
-    "person.nationality": { type: "value", size: 100 } 
-  }
+  disjunctiveFacets: ["type", "person.citizenship"],
 };
 
 const CustomResultView = ({
@@ -141,26 +141,17 @@ export default function App() {
             <div className="App">
               <ErrorBoundary>
                 <Layout
-                  header={<SearchBox autocompleteSuggestions={false} />}
+                  header={ <SearchBox autocompleteSuggestions={false} />}
                   sideContent={
-                    <div>
-                      <Facet
-                        field="type"
-                        label="Type"
-                        filterType="any"
-                        isFilterable={true}
-                      />
-                      <Facet
-                        field="person.gender"
-                        label="Gender"
-                        filterType="any"
-                        isFilterable={true}
-                      />
-                    </div>
+                    <React.Fragment>
+                      <Facet field={"type"} label={"type"} />
+                      <Facet field={"person.citizenship"} label={"Citizenship"} />
+                      <Facet field={"person.gender"} label={"Gender"} />
+                    </React.Fragment>
                   }
                   bodyContent={
                     <React.Fragment>
-                    <Results resultView={CustomResultView}/>
+                      <Results resultView={CustomResultView}/>
                     </React.Fragment>
                   }
                 />
@@ -172,3 +163,4 @@ export default function App() {
     </SearchProvider>
   );
 }
+
