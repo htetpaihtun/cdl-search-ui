@@ -85,7 +85,7 @@ const config = {
   // disjunctiveFacets: ["acres", "states", "date_established", "location"],
   facets: {
     "type.keyword" : { type: "value" },
-    "person.gender": { type: "value", size: 3 } 
+    "person.gender": { type: "value", size: 3 },
     "person.nationality": { type: "value", size: 100 } 
   }
 };
