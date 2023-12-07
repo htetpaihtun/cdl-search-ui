@@ -1,0 +1,14 @@
+{
+  "engineName": "cdl-aml-search",
+  "searchKey": "search-nyxkw1fuqex9qjhfvatbqfmw",
+  "searchFields": ["dataid" , "ID"],
+  "resultFields": [
+    "english_name.primary",
+    "ID",
+    "type",
+    "person.citizenship",
+    "mas.listed_on",
+    "person"
+  ],
+  "titleField": "ID"
+}

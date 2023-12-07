@@ -31,14 +31,14 @@ const { hostIdentifier, searchKey, endpointBase, engineName } = getConfig();
 const connector = new ElasticsearchAPIConnector(
   {
     cloud: {
-      id: "CDL_AML_Project:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQ4ZTIwZWU5YzgyZGQ0ZmJkYTQxMzZjNmRiOTIxNTFkNiRkMDU1NDJhNTg5YzQ0YjJjYjg2ODEzNTFiYjUxNzQyMQ=="
+      id: "CDL_AML:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyRkNThhMGFhMGQzZWU0MTU5OGRhOGMxMTQ3NDQ2ZDU4NiQ0NTAxM2Y1N2QxMDg0MzBiYWQwZjQ2MTgxOTcwNDllYg=="
     },
-    apiKey: "Wm1fVjk0c0JqV3BlMUxrSWRObVM6Zkk5NlBBQmlTTU94Q2k5dkFFSWdYZw==",
-    index: ["aml-mas", "aml-adhoc", "aml-dj-2023-11-30"]
+    apiKey: "ZGFDN05Jd0JZbHlZNm1kd1VHTkE6bEZrUzBQOGFRX3FLdGgzYkRzZHMtUQ==",
+    index: ["aml-mas", "aml-adhoc", "aml-dj"]
   },
   (requestBody, requestState, queryConfig) => {
     console.log("postProcess requestBody Call", requestBody); // logging out the requestBody before sending to Elasticsearch
-    requestBody.min_score = 499
+    requestBody.min_score = 0
     if (!requestState.searchTerm) return requestBody;
     
     console.log(queryConfig)
@@ -70,28 +70,22 @@ const config = {
       english_name: {
         weight: 3
       },
-      dataid: {
-      }
+      dataid: {}
     },
     result_fields: {
-      type: {
-        snippet : {}
-      },
+      type: { snippet : {} },
       dataid : { raw: {} },
-      entity: {
-        raw: {}
-      },
-      person: {
-        raw: {}
-      },
+      entity: { raw: {} },
+      person: { raw: {} },
       mas : { raw: {} },
       adhoc : { raw: {} },
       dj : { raw: {} },
     },
   },
-  disjunctiveFacets: ["acres", "states", "date_established", "location"],
+  // disjunctiveFacets: ["acres", "states", "date_established", "location"],
   facets: {
-    type: { type: "value", size: 30 },
+    "type.keyword" : { type: "value" },
+    "person.gender": { type: "value", size: 3 } 
   }
 };
 
@@ -150,8 +144,14 @@ export default function App() {
                   sideContent={
                     <div>
                       <Facet
-                        field={"type"}
+                        field="type"
                         label="Type"
+                        filterType="any"
+                        isFilterable={true}
+                      />
+                      <Facet
+                        field="person.gender"
+                        label="Gender"
                         filterType="any"
                         isFilterable={true}
                       />
