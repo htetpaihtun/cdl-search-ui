@@ -101,6 +101,14 @@ const config = {
             name : "Within a week"
           },
           {
+            from : moment().subtract(1, "months").toISOString(),
+            name : "Within a month"
+          },
+          {
+            from : moment().subtract(6, "months").toISOString(),
+            name : "Within six months"
+          },
+          {
             from : moment().subtract(1, "years").toISOString(),
             name : "Within a year"
           },
