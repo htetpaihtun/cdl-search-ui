@@ -32,11 +32,10 @@ const { hostIdentifier, searchKey, endpointBase, engineName } = getConfig();
 const connector = new ElasticsearchAPIConnector(
   {
     cloud: {
-      id: "CDL_AML:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyRkNThhMGFhMGQzZWU0MTU5OGRhOGMxMTQ3NDQ2ZDU4NiQ0NTAxM2Y1N2QxMDg0MzBiYWQwZjQ2MTgxOTcwNDllYg=="
+      id: "CDL_AML:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyRkYTFhZTcwMTRjNTk0MWU4ODVjMGFlMjUwOGJmZDQ3YiQ0NDBlNmVhNjJmNTk0NTk3OGVmOTdlYjQ3YTM3ZGQyMg=="
     },
-    apiKey: "ZGFDN05Jd0JZbHlZNm1kd1VHTkE6bEZrUzBQOGFRX3FLdGgzYkRzZHMtUQ==",
-    index: ["aml-mas", "aml-adhoc", "aml-dj-person"]
-    // index: ["aml-dj-person-memoenhance"]
+    apiKey: "eVdYZWU0d0J4QUEtN0gxcXlncjg6bGw2Zlpra2NUbks4QWdibS14d0x4dw==",
+    index: ["aml-mas", "aml-adhoc", "aml-dj"]
   },
   (requestBody, requestState, queryConfig) => {
     console.log("postProcess requestBody Call", requestBody); // logging out the requestBody before sending to Elasticsearch
@@ -83,7 +82,8 @@ const config = {
       person: { raw: {} },
       mas : { raw: {} },
       adhoc : { raw: {} },
-      dj : { raw: {} },
+      dj : { snippet: {} },
+      'dj.raw.ProfileNotes' : { raw: {} },
     },
     facets: {
       type: { type: "value", size: 10 },
@@ -199,7 +199,6 @@ export default function App() {
   );
 }
 
-
 const CustomResultView = ({
   result,
   onClickLink
@@ -209,36 +208,55 @@ const CustomResultView = ({
 }) => {
   const fieldOrder = ['score', 'dataid', 'type', 'person', 'entity', 'mas', 'adhoc', 'dj'];
 
+  const getFieldValue = (result, fieldPath) => {
+    return fieldPath.split('.').reduce((acc, part) => acc && acc[part], result);
+  };
+
   return (
-    <li className="sui-result">
+    <li className="sui-result" onClick={onClickLink}>
       <div className="sui-result__body">
         <div className="sui-result__details">
-          {fieldOrder.map((key) => (
-            <div key={key}>
-              {key === 'score' ? (
-                result._meta?.rawHit?._score ? (
-                  <React.Fragment>
-                    <span className="sui-result__key">{key}</span>
-                    <span className="sui-result__value">{result._meta.rawHit._score}</span>
-                  </React.Fragment>
-                ) : null
-              ) : (
-                result[key] && (
-                  <React.Fragment>
-                    <span className="sui-result__key">{key}</span>
-                    {typeof result[key].raw === 'object' ? (
-                      <pre style={{ backgroundColor: "#f1f4fa", padding: "10px", whiteSpace: "pre-wrap", marginTop: "0px" }}>{JSON.stringify(result[key].raw, null, 2)}</pre>
-                    ) : (
-                      <span className="sui-result__value">{result[key].raw}</span>
-                    )}
-                  </React.Fragment>
-                )
-              )}
+          {fieldOrder.map((key) => {
+            const fieldValue = getFieldValue(result, key);
+
+            // Handling for 'dj' field, excluding 'ProfileNotes'
+            if (key === 'dj' && fieldValue && fieldValue.raw) {
+              const { ProfileNotes, ...otherDjFields } = fieldValue.raw;
+              return (
+                <div key={key}>
+                  <span className="sui-result__key">{key}</span>
+                  <pre style={{ backgroundColor: "#f1f4fa", padding: "10px", whiteSpace: "pre-wrap", marginTop: "0px" }}>
+                    {JSON.stringify(otherDjFields, null, 2)}
+                  </pre>
+                </div>
+              );
+            }
+
+            // Handling for other fields
+            return fieldValue ? (
+              <div key={key}>
+                <span className="sui-result__key">{key}</span>
+                {typeof fieldValue.raw === 'object' ? (
+                  <pre style={{ backgroundColor: "#f1f4fa", padding: "10px", whiteSpace: "pre-wrap", marginTop: "0px" }}>
+                    {JSON.stringify(fieldValue.raw, null, 2)}
+                  </pre>
+                ) : (
+                  <span className="sui-result__value">{fieldValue.raw}</span>
+                )}
+              </div>
+            ) : null;
+          })}
+
+          {result.dj?.raw?.ProfileNotes && (
+            <div>
+              <pre style={{ backgroundColor: "#f1f4fa", padding: "10px", whiteSpace: "pre-wrap", marginTop: "0px" }}>
+                <span className="sui-result__key">Profile Notes</span>
+                <div dangerouslySetInnerHTML={{ __html: result.dj.raw.ProfileNotes }} />
+              </pre>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </li>
   );
-}
-
+};
